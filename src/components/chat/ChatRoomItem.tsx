@@ -1,10 +1,10 @@
 "use client"
 
+import { useCustomRouter } from "@/hooks/common/useCustomRouter";
 import { ChatRoomItemProps } from "@/types/props/chat-room-item-props"
-import { useRouter } from "next/navigation"
 
 const ChatRoomItem = ({ chatRoomImage, id, lastMessage, memberCount, name }: ChatRoomItemProps) => {
-  const router = useRouter();
+  const router = useCustomRouter();
 
   return (
     <div className="w-full py-2 flex itemes-center gap-4" onClick={() => router.push(`/my-chats/${id}`) }>

@@ -37,7 +37,7 @@ const RootLayout = ({
       </head>
       <body className={`${pretendard.variable} antialiased`}>
         <ToastContainer />
-        <LoadingProvider color="black" />
+        <LoadingProvider color="#FF582A" />
         {children}
       </body>
     </html>

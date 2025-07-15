@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Globe2, Home, MessageCircle, User2, UsersRound } from "lucide-react";
+import { useCustomRouter } from "@/hooks/common/useCustomRouter";
 
 type Tab = "groups" | "home" | "chats" | "profile" | "arounds";
 
 const Tabbar = () => {
   const pathname = usePathname();
-  const router = useRouter();
+  const router = useCustomRouter();
 
   const getCurrentTab = (): Tab => {
     if (pathname.includes("/my-groups")) return "groups";

@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import ToastContainer from "@/components/provider/ToastProvider";
 import LoadingProvider from "@/components/provider/LoadingProvider";
+import { CookiesProvider } from "next-client-cookies/server";
 
 export const metadata: Metadata = {
   title: "cher1sh-next-app",
@@ -38,7 +39,9 @@ const RootLayout = ({
       <body className={`${pretendard.variable} antialiased`}>
         <ToastContainer />
         <LoadingProvider color="#FF582A" />
-        {children}
+        <CookiesProvider>
+          {children}
+        </CookiesProvider>
       </body>
     </html>
   );

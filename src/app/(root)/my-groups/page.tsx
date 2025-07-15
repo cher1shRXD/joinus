@@ -4,15 +4,17 @@ import { customFetch } from "@/libs/fetch/customFetch";
 import { useUserStore } from "@/stores/user";
 import { Meeting } from "@/types/meeting";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import GoBack from "@/components/common/GoBack";
+import { useCustomRouter } from "@/hooks/common/useCustomRouter";
+import SearchInput from "@/components/common/SearchInput";
 
 const MyGroupsPage = () => {
   const { user } = useUserStore();
   const [joinedMeetings, setJoinedMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useCustomRouter();
 
   useEffect(() => {
     const fetchJoinedMeetings = async () => {
@@ -31,9 +33,13 @@ const MyGroupsPage = () => {
     fetchJoinedMeetings();
   }, []);
 
-  const handleGroupClick = (meetingId: string) => {
-    router.push(`/my-groups/${meetingId}`);
+  const handleGroupClick = (meetingId: string, type: string) => {
+    router.push(`/my-groups/${type}+${meetingId}`);
   };
+
+  const filteredMeetings = joinedMeetings.filter(meeting =>
+    meeting.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (loading) {
     return (
@@ -52,20 +58,18 @@ const MyGroupsPage = () => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="w-full p-2">
-        <GoBack title="내 모임" />
-      </div>
-      <div className="flex-1 p-3 overflow-y-auto">
-        {joinedMeetings.length === 0 ? (
+    <div className="w-full h-full p-4 flex flex-col">
+      <h1 className="text-xl font-semibold">내 모임</h1>
+      <div className="flex-1 overflow-y-auto">
+        {filteredMeetings.length === 0 ? (
           <p className="text-center text-gray-500 mt-10">참여한 모임이 없습니다.</p>
         ) : (
           <div className="space-y-4">
-            {joinedMeetings.map((meeting) => (
+            {filteredMeetings.map((meeting) => (
               <div
                 key={meeting.meetingId}
                 className="bg-white p-4 rounded-lg shadow cursor-pointer"
-                onClick={() => handleGroupClick(meeting.meetingId)}
+                onClick={() => handleGroupClick(meeting.meetingId, meeting.type)}
               >
                 <p className="font-bold text-lg">{meeting.name}</p>
                 <p className="text-gray-600">{meeting.description}</p>
@@ -77,9 +81,14 @@ const MyGroupsPage = () => {
                     <p className="text-blue-700 font-semibold">
                       당신은 이 모임의 관리자입니다.
                     </p>
-                    {/* TODO: 참가 요청 관리 UI 추가 */}
-                    <button className="mt-1 text-blue-500 underline">
-                      참가 요청 확인 (구현 예정)
+                    <button
+                      className="mt-1 text-blue-500 underline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/my-groups/${meeting.type}+${meeting.meetingId}/requests`);
+                      }}
+                    >
+                      참가 요청 확인
                     </button>
                   </div>
                 )}

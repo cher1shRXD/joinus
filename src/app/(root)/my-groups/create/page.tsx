@@ -15,7 +15,7 @@ const CreateGroup = () => {
     appkey: process.env.NEXT_PUBLIC_KAKAO_API_KEY!,
     libraries: ["services"],
   });
-  const [selectedGroupType, setSelectedGroupType] = useState(0);
+  const [selectedGroupType, setSelectedGroupType] = useState(1);
   const [images, setImages] = useState<string[]>([]);
   const location = useGeolocation();
   const [groupInfo, setGroupInfo] = useState({
@@ -179,22 +179,22 @@ const CreateGroup = () => {
         <div className="w-full flex bg-white rounded-xl items-center relative border border-gray-300">
           <div
             className={`absolute top-1 ${
-              selectedGroupType === 0 ? "left-1" : "left-[calc(50%-4px)]"
+              selectedGroupType === 1 ? "left-1" : "left-[calc(50%-4px)]"
             } bg-primary h-[calc(100%-8px)] w-1/2 rounded-lg transition-all duration-300`}
           />
-          <div
-            className={`flex-1 text-center py-3 text-sm z-20 font-medium ${
-              selectedGroupType === 0 ? "text-white" : "text-primary"
-            }`}
-            onClick={() => setSelectedGroupType(0)}>
-            정기모임
-          </div>
           <div
             className={`flex-1 text-center py-3 text-sm z-20 font-medium ${
               selectedGroupType === 1 ? "text-white" : "text-primary"
             }`}
             onClick={() => setSelectedGroupType(1)}>
             번개모임
+          </div>
+          <div
+            className={`flex-1 text-center py-3 text-sm z-20 font-medium ${
+              selectedGroupType === 0 ? "text-white" : "text-primary"
+            }`}
+            onClick={() => setSelectedGroupType(0)}>
+            정기모임
           </div>
         </div>
 

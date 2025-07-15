@@ -6,6 +6,6 @@ export interface SelectedGroupStore {
 }
 
 export const useSelectedGroupStore = create<SelectedGroupStore>(set => ({
-  selected: 0,
+  selected: 1,
   setSelected: (selected) => set({selected})
 }))

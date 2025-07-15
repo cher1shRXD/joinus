@@ -6,71 +6,26 @@ import { toast } from "@/components/provider/ToastProvider";
 import { customFetch } from "@/libs/fetch/customFetch";
 import { Plus } from "lucide-react";
 import type { ChangeEvent } from "react";
+import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk";
 
-declare global {
-  interface Window {
-    daum?: any;
-  }
-}
 
-const CreateGroup = () => {
+
+  const CreateGroup = () => {
+  useKakaoLoader({
+    appkey: process.env.NEXT_PUBLIC_KAKAO_API_KEY!,
+    libraries: ["services"],
+  });
   const [selectedGroupType, setSelectedGroupType] = useState(0);
   const [images, setImages] = useState<string[]>([]);
-  const [loadingAddr, setLoadingAddr] = useState(false);
-
   const [groupInfo, setGroupInfo] = useState({
     name: "",
     description: "",
     category: "",
     requiresApproval: false,
     address: "",
-    lat: 0,
-    lng: 0,
+    lat: 33.450701,
+    lng: 126.570667,
   });
-
-  /* ------------------------------------------------------------------ */
-  /* 주소 검색 + 좌표 변환 -------------------------------------------- */
-  /* ------------------------------------------------------------------ */
-  const openAddressSearch = () => {
-    if (!window.daum) return toast.error("주소 검색 스크립트가 로드되지 않았습니다.");
-    new window.daum.Postcode({
-      oncomplete: async (data: any) => {
-        try {
-          setLoadingAddr(true);
-          const fullAddress = data.address;
-          const coords = await fetchCoords(fullAddress);
-          setGroupInfo((prev) => ({
-            ...prev,
-            address: fullAddress,
-            lat: coords.lat,
-            lng: coords.lng,
-          }));
-        } catch {
-          toast.error("좌표 변환 실패");
-        } finally {
-          setLoadingAddr(false);
-        }
-      },
-    }).open();
-  };
-
-  /** 카카오 REST API로 주소 → 좌표 */
-  const fetchCoords = async (address: string) => {
-    const res = await fetch(
-      `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`,
-      {
-        headers: {
-          Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_API_KEY}`,
-        },
-      }
-    );
-    const json = await res.json();
-    if (json.documents?.length) {
-      const { y, x } = json.documents[0]; // y=lat, x=lng
-      return { lat: parseFloat(y), lng: parseFloat(x) };
-    }
-    throw new Error("No coords");
-  };
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -101,10 +56,11 @@ const CreateGroup = () => {
 
   const regularSubmit = async () => {
     const { name, description, category, address, lat, lng } = groupInfo;
+    console.log(groupInfo);
     if (!name) return toast.error("모임명을 입력해주세요.");
     if (!description) return toast.error("모임 설명을 입력해주세요.");
     if (!category) return toast.error("카테고리를 선택해주세요.");
-    if (!address) return toast.error("주소를 입력해주세요.");
+    if (!address) return toast.error("지도를 통해 모임 위치를 설정해주세요.");
 
     try {
       await customFetch.post("/meetings/regular", {
@@ -121,13 +77,30 @@ const CreateGroup = () => {
     }
   };
 
+  /** 카카오 지도 SDK Geocoder로 좌표 → 주소 */
+  const fetchAddressFromCoords = async (lat: number, lng: number) => {
+    if (lat === 0 && lng === 0) {
+      setGroupInfo((prev) => ({ ...prev, address: "" }));
+      return;
+    }
+
+    const geocoder = new kakao.maps.services.Geocoder();
+    const coord = new kakao.maps.LatLng(lat, lng);
+
+    geocoder.coord2Address(coord.getLng(), coord.getLat(), (result, status) => {
+      if (status === kakao.maps.services.Status.OK) {
+        const address = result[0].address?.address_name || result[0].road_address?.address_name;
+        setGroupInfo((prev) => ({ ...prev, address: address || "" }));
+      } else {
+        console.error("Failed to fetch address from coords:", status);
+        setGroupInfo((prev) => ({ ...prev, address: "" }));
+      }
+    });
+  };
+
   useEffect(() => {
-    if (window.daum) return;
-    const script = document.createElement("script");
-    script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
+    fetchAddressFromCoords(groupInfo.lat, groupInfo.lng);
+  }, [groupInfo.lat, groupInfo.lng]);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -228,28 +201,46 @@ const CreateGroup = () => {
           </select>
         </section>
 
-        {/* 주소 --------------------------------------------------------- */}
         <section className="mt-6">
-          <p className="text-base font-semibold mb-2">주소</p>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={groupInfo.address}
-              readOnly
-              placeholder="주소 검색 버튼을 클릭하세요"
-              className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50"
-            />
-            <button
-              onClick={openAddressSearch}
-              className="px-4 py-2 bg-primary text-white rounded-lg whitespace-nowrap"
+          <p className="text-base font-semibold mb-2">모임 위치</p>
+          <div className="w-full h-64 rounded-lg overflow-hidden">
+            <Map
+              center={{ lat: groupInfo.lat, lng: groupInfo.lng }}
+              style={{ width: "100%", height: "100%" }}
+              level={3}
+              onDragEnd={(map) => {
+                const latlng = map.getCenter();
+                setGroupInfo((prev) => ({
+                  ...prev,
+                  lat: latlng.getLat(),
+                  lng: latlng.getLng(),
+                }));
+              }}
+              onClick={(_t, mouseEvent) => {
+                setGroupInfo((prev) => ({
+                  ...prev,
+                  lat: mouseEvent.latLng.getLat(),
+                  lng: mouseEvent.latLng.getLng(),
+                }));
+              }}
             >
-              {loadingAddr ? "로딩..." : "주소 검색"}
-            </button>
+              <MapMarker
+                position={{ lat: groupInfo.lat, lng: groupInfo.lng }}
+                draggable={true}
+                onDragEnd={(marker) => {
+                  const latlng = marker.getPosition();
+                  setGroupInfo((prev) => ({
+                    ...prev,
+                    lat: latlng.getLat(),
+                    lng: latlng.getLng(),
+                  }));
+                }}
+              />
+            </Map>
           </div>
           {groupInfo.address && (
             <p className="mt-1 text-xs text-gray-400">
-              (위도: {groupInfo.lat.toFixed(6)}, 경도:{" "}
-              {groupInfo.lng.toFixed(6)})
+              선택된 주소: {groupInfo.address}
             </p>
           )}
         </section>
@@ -267,7 +258,7 @@ const CreateGroup = () => {
         </section>
 
         {/* 제출 버튼 ---------------------------------------------------- */}
-        <div className="fixed bottom-18 left-0 w-full px-2">
+        <div className="fixed bottom-18 left-0 w-full px-2 z-50">
           <button
             onClick={regularSubmit}
             className="w-full bg-primary text-white py-4 rounded-lg text-lg font-semibold"

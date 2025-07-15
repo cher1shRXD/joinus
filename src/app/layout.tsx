@@ -35,7 +35,7 @@ const RootLayout = ({
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
-        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services"></script>
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services" async></script>
       </head>
       <body className={`${pretendard.variable} antialiased`}>
         <ToastContainer />

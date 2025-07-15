@@ -1,20 +1,62 @@
 "use client"
 
 import { useCustomRouter } from "@/hooks/common/useCustomRouter";
-import { ChatRoomItemProps } from "@/types/props/chat-room-item-props"
+import { ChatRoomItemProps } from "@/types/props/chat-room-item-props";
+import { formatChatTime } from "@/utils/date";
 
-const ChatRoomItem = ({ chatRoomImage, id, lastMessage, memberCount, name }: ChatRoomItemProps) => {
+const ChatRoomItem = ({ chatRoomImage, profileImageUrl, roomId, lastMessage, memberCount, name, type, lastMessageAt, onClick }: ChatRoomItemProps) => {
   const router = useCustomRouter();
 
+
+  const imageUrl = (profileImageUrl || chatRoomImage) 
+    ? ((profileImageUrl || chatRoomImage)!.startsWith('/uploads') 
+        ? `${process.env.NEXT_PUBLIC_API_URL}${profileImageUrl || chatRoomImage}` 
+        : (profileImageUrl || chatRoomImage))
+    : null;
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      router.push(`/my-chats/${roomId}`);
+    }
+  };
+
   return (
-    <div className="w-full py-2 flex itemes-center gap-4" onClick={() => router.push(`/my-chats/${id}`) }>
-      <img src={chatRoomImage} className="bg-gray-300 w-16 h-16 rounded-full" />
-      <div className="flex-1 h-full flex flex-col justify-center">
-        <div className="flex items-center gap-2">
-          <p className="font-bold text-lg">{name.length > 20 ? name.slice(0, 20) + "..." : name}</p>
-          <p className="text-sm text-gray-500">{memberCount}</p>
+    <div 
+      className="flex items-center gap-3 p-3 mx-2 rounded-2xl hover:bg-gray-50 cursor-pointer transition-colors" 
+      onClick={handleClick}
+    >
+      <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={name} 
+            className="w-full h-full object-cover" 
+          />
+        ) : (
+          <div className="w-full h-full bg-[#FF582A] flex items-center justify-center">
+            <span className="text-white text-lg font-medium">
+              {name.charAt(0)}
+            </span>
+          </div>
+        )}
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2 min-w-0">
+            <h3 className="font-medium text-gray-900 truncate text-base">{name}</h3>
+            {type === 'group' && memberCount && (
+              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{memberCount}</span>
+            )}
+          </div>
+          {lastMessageAt && (
+            <span className="text-xs text-gray-400 ml-2 flex-shrink-0">{formatChatTime(lastMessageAt)}</span>
+          )}
         </div>
-        <p className="text-sm text-gray-400">{lastMessage.length > 50 ? lastMessage.slice(0, 50) + "..." : lastMessage}</p>
+        
+        <p className="text-sm text-gray-500 truncate">{lastMessage || '메시지가 없습니다'}</p>
       </div>
     </div>
   )

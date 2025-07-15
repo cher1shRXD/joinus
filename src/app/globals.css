@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+* {
+  /* overflow: hidden; */
+}
+
+@theme {
+  --color-primary: #FF582A;
+}

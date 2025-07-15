@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-* {
-  /* overflow: hidden; */
+body, html {
+  overflow: hidden;
 }
 
 @theme {

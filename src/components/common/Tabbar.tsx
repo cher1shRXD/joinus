@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, MessageCircle, User2, UsersRound } from "lucide-react";
+import { Globe2, Home, MessageCircle, User2, UsersRound } from "lucide-react";
 
-type Tab = "groups" | "home" | "chats" | "profile";
+type Tab = "groups" | "home" | "chats" | "profile" | "arounds";
 
 const Tabbar = () => {
   const pathname = usePathname();
@@ -33,11 +33,21 @@ const Tabbar = () => {
       case "profile":
         router.push("/profile");
         break;
+      case "arounds":
+        router.push("/arounds");
+        break;
     }
   }, [activeTab]);
 
   return (
     <div className="w-full h-16 border-t border-gray-200 flex justify-evenly items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] bg-white text-xs fixed bottom-0 z-50">
+      <button
+        onClick={() => setActiveTab("arounds")}
+        className={`${activeTab === "arounds" ? "text-primary" : "text-gray-500"} flex flex-col items-center gap-0.5`}
+      >
+        <Globe2 />
+        <p>둘러보기</p>
+      </button>
       <button
         onClick={() => setActiveTab("groups")}
         className={`${activeTab === "groups" ? "text-primary" : "text-gray-500"} flex flex-col items-center gap-0.5`}

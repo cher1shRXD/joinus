@@ -33,7 +33,7 @@ const PlaceDetail = () => {
         place ? "h-[35vh]" : "h-24"
       } bg-white rounded-t-2xl absolute bottom-0 left-0 z-40 shadow-[0_-8px_12px_-1px_rgba(0,0,0,0.1)] transition-all pb-16`}>
       <div
-        className="w-full h-5 flex items-center justify-center touch-none cursor-grab"
+        className="w-full h-5 flex items-center justify-center touch-none cursor-grab overflow-scroll"
         onMouseDown={(e) => handleStart(e.clientY)}
         onMouseMove={(e) => handleMove(e.clientY)}
         onMouseUp={handleEnd}

@@ -2,7 +2,7 @@
 
 import GroupTypeSelector from "@/components/common/GroupTypeSelector";
 import SearchInput from "@/components/common/SearchInput";
-import PlaceDetail from "@/components/map/PlaceDetail";
+import MeetingDetail from "@/components/map/MeetingDetail";
 import { useCustomRouter } from "@/hooks/common/useCustomRouter";
 import { Plus } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -30,7 +30,7 @@ const Main = () => {
       </button>
       <SearchInput />
       <GroupTypeSelector />
-      <PlaceDetail />
+      <MeetingDetail />
     </>
   );
 };

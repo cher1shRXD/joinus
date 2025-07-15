@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useSelectedGroupStore } from "@/stores/selected-group";
 
 const GroupTypeSelector = () => {
-  const [selected, setSelected] = useState(0);
+
+  const { selected, setSelected } = useSelectedGroupStore();
 
   return (
     <div className="w-full px-3 flex justify-center fixed top-16 z-50">

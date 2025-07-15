@@ -12,6 +12,7 @@ const Tabbar = () => {
   const router = useCustomRouter();
 
   const getCurrentTab = (): Tab => {
+    if (pathname.includes("/arounds")) return "arounds";
     if (pathname.includes("/my-groups")) return "groups";
     if (pathname.includes("/my-chats")) return "chats";
     if (pathname.includes("/profile")) return "profile";
@@ -20,8 +21,20 @@ const Tabbar = () => {
 
   const [activeTab, setActiveTab] = useState<Tab>(getCurrentTab);
 
+  // pathname이 바뀌었을 때 activeTab 동기화
   useEffect(() => {
-    switch (activeTab) {
+    const newTab = getCurrentTab();
+    if (newTab !== activeTab) {
+      setActiveTab(newTab);
+    }
+  }, [pathname]);
+
+  // 탭 클릭 시 라우터 이동 + 상태 설정
+  const handleTabClick = (tab: Tab) => {
+    if (tab === activeTab) return; // 중복 클릭 방지
+    setActiveTab(tab);
+
+    switch (tab) {
       case "groups":
         router.push("/my-groups");
         break;
@@ -38,47 +51,35 @@ const Tabbar = () => {
         router.push("/arounds");
         break;
     }
-  }, [activeTab]);
+  };
 
   return (
     <div className="w-full h-16 border-t border-gray-200 flex justify-evenly items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] bg-white text-xs fixed bottom-0 z-50">
-      <button
-        onClick={() => setActiveTab("arounds")}
-        className={`${activeTab === "arounds" ? "text-primary" : "text-gray-500"} flex flex-col items-center gap-0.5`}
-      >
+      <button onClick={() => handleTabClick("arounds")} className={tabClass(activeTab, "arounds")}>
         <Globe2 />
         <p>둘러보기</p>
       </button>
-      <button
-        onClick={() => setActiveTab("groups")}
-        className={`${activeTab === "groups" ? "text-primary" : "text-gray-500"} flex flex-col items-center gap-0.5`}
-      >
+      <button onClick={() => handleTabClick("groups")} className={tabClass(activeTab, "groups")}>
         <UsersRound />
         <p>내 모임</p>
       </button>
-      <button
-        onClick={() => setActiveTab("home")}
-        className={`${activeTab === "home" ? "text-primary" : "text-gray-500"} flex flex-col items-center gap-0.5`}
-      >
+      <button onClick={() => handleTabClick("home")} className={tabClass(activeTab, "home")}>
         <Home />
         <p>홈</p>
       </button>
-      <button
-        onClick={() => setActiveTab("chats")}
-        className={`${activeTab === "chats" ? "text-primary" : "text-gray-500"} flex flex-col items-center gap-0.5`}
-      >
+      <button onClick={() => handleTabClick("chats")} className={tabClass(activeTab, "chats")}>
         <MessageCircle />
         <p>채팅</p>
       </button>
-      <button
-        onClick={() => setActiveTab("profile")}
-        className={`${activeTab === "profile" ? "text-primary" : "text-gray-500"} flex flex-col items-center gap-0.5`}
-      >
+      <button onClick={() => handleTabClick("profile")} className={tabClass(activeTab, "profile")}>
         <User2 />
         <p>프로필</p>
       </button>
     </div>
   );
 };
+
+const tabClass = (activeTab: string, current: string) =>
+  `${activeTab === current ? "text-primary" : "text-gray-500"} flex flex-col items-center gap-0.5`;
 
 export default Tabbar;

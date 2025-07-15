@@ -11,19 +11,24 @@ interface MeetingBase {
   members: string[];
   createdAt: string;
   updatedAt: string;
+  category: string;
+  type: string;
+  isMember: boolean
 }
 
 export interface RegularMeeting extends MeetingBase {
   photos: string[];
-  category: string;
   requiresApproval: boolean;
   status: "active" | "inactive";
 }
 
-export interface OneTimeMeeting extends MeetingBase {
-  startTime: string;
+export interface FlashMeeting extends MeetingBase {
+  startTime: {
+    _seconds: number;
+    _nanoseconds: number;
+  };
   expectedDurationMinutes: number;
   memberLimit: number;
 }
 
-export type Meeting = RegularMeeting | OneTimeMeeting;
+export type Meeting = RegularMeeting | FlashMeeting;

@@ -11,7 +11,7 @@ import useGeolocation from "@/hooks/common/useGeolocation";
 import { useCustomRouter } from "@/hooks/common/useCustomRouter";
 
 const CreateGroup = () => {
-  useKakaoLoader({
+  const [kakaoLoading, kakaoError] = useKakaoLoader({
     appkey: process.env.NEXT_PUBLIC_KAKAO_API_KEY!,
     libraries: ["services"],
   });
@@ -99,19 +99,29 @@ const CreateGroup = () => {
         location: { latitude: lat, longitude: lng, addressString: address },
       });
       toast.success("모임이 생성되었습니다!");
-      router.push("/")
+      router.push("/");
     } catch {
       toast.error("모임 생성 실패");
     }
   };
 
   const flashSubmit = async () => {
-    const { name, description, address, lat, lng, startTime, expectedDurationMinutes, memberLimit } = groupInfo;
+    const {
+      name,
+      description,
+      address,
+      lat,
+      lng,
+      startTime,
+      expectedDurationMinutes,
+      memberLimit,
+    } = groupInfo;
     if (!name) return toast.error("모임명을 입력해주세요.");
     if (!description) return toast.error("모임 설명을 입력해주세요.");
     if (!address) return toast.error("지도를 통해 모임 위치를 설정해주세요.");
     if (!startTime) return toast.error("모임 시작 시간을 입력해주세요.");
-    if (expectedDurationMinutes <= 0) return toast.error("예상 소요 시간을 입력해주세요.");
+    if (expectedDurationMinutes <= 0)
+      return toast.error("예상 소요 시간을 입력해주세요.");
     if (memberLimit <= 0) return toast.error("인원 제한 수를 입력해주세요.");
 
     try {
@@ -122,6 +132,7 @@ const CreateGroup = () => {
         expectedDurationMinutes: groupInfo.expectedDurationMinutes,
         memberLimit: groupInfo.memberLimit,
         location: { latitude: lat, longitude: lng, addressString: address },
+        category: groupInfo.category,
       });
       toast.success("모임이 생성되었습니다!");
       router.push("/");
@@ -153,8 +164,10 @@ const CreateGroup = () => {
   };
 
   useEffect(() => {
-    fetchAddressFromCoords(groupInfo.lat, groupInfo.lng);
-  }, [groupInfo.lat, groupInfo.lng]);
+    if (!kakaoLoading && !kakaoError) {
+      fetchAddressFromCoords(groupInfo.lat, groupInfo.lng);
+    }
+  }, [kakaoLoading, kakaoError, groupInfo.lat, groupInfo.lng]);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -231,8 +244,7 @@ const CreateGroup = () => {
                   lat: mouseEvent.latLng.getLat(),
                   lng: mouseEvent.latLng.getLng(),
                 }));
-              }}
-            >
+              }}>
               <MapMarker
                 position={{ lat: groupInfo.lat, lng: groupInfo.lng }}
                 draggable={true}
@@ -254,6 +266,36 @@ const CreateGroup = () => {
           )}
         </section>
 
+        {/* 카테고리 (정기모임, 번개모임 공통) */}
+        <section className="mt-6">
+          <p className="text-base font-semibold mb-2">카테고리</p>
+          <select
+            name="category"
+            value={groupInfo.category}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:border-primary">
+            <option value="">카테고리 선택</option>
+            <option value="운동/헬스">운동/헬스</option>
+            <option value="자기계발">자기계발</option>
+            <option value="인문학/책/글">인문학/책/글</option>
+            <option value="외국/언어">외국/언어</option>
+            <option value="음악/악기">음악/악기</option>
+            <option value="스포츠관람">스포츠관람</option>
+            <option value="아웃도어/여행">아웃도어/여행</option>
+            <option value="업종/직무">업종/직무</option>
+            <option value="문화/공연">문화/공연</option>
+            <option value="공예/만들기">공예/만들기</option>
+            <option value="댄스/무용">댄스/무용</option>
+            <option value="봉사활동">봉사활동</option>
+            <option value="사교/인맥">사교/인맥</option>
+            <option value="차/바이크">차/바이크</option>
+            <option value="사진/영상">사진/영상</option>
+            <option value="게임/오락">게임/오락</option>
+            <option value="요리/제조">요리/제조</option>
+            <option value="반려동물">반려동물</option>
+          </select>
+        </section>
+
         {selectedGroupType === 0 && (
           <>
             {/* 이미지 업로드 (정기모임) */}
@@ -264,8 +306,10 @@ const CreateGroup = () => {
                   <img
                     key={img}
                     src={process.env.NEXT_PUBLIC_API_URL + img}
-                    alt=""
-                    className="w-24 h-24 rounded-lg object-cover"
+                    alt="Uploaded image"
+                    width={96}
+                    height={96}
+                    className="rounded-lg object-cover w-24 h-24"
                   />
                 ))}
                 <div
@@ -283,20 +327,6 @@ const CreateGroup = () => {
                   />
                 </div>
               </div>
-            </section>
-
-            {/* 카테고리 (정기모임) */}
-            <section className="mt-6">
-              <p className="text-base font-semibold mb-2">카테고리</p>
-              <select
-                name="category"
-                value={groupInfo.category}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:border-primary">
-                <option value="">카테고리 선택</option>
-                <option value="운동/헬스">운동/헬스</option>
-                {/* 다른 카테고리 추가 */}
-              </select>
             </section>
 
             {/* 승인 여부 (정기모임) */}
@@ -329,7 +359,9 @@ const CreateGroup = () => {
 
             {/* 예상 소요 시간 (번개모임) */}
             <section className="mt-6">
-              <p className="text-base font-semibold mb-2">예상 소요 시간 (분)</p>
+              <p className="text-base font-semibold mb-2">
+                예상 소요 시간 (분)
+              </p>
               <input
                 type="number"
                 name="expectedDurationMinutes"

@@ -7,3 +7,13 @@ body, html {
 @theme {
   --color-primary: #FF582A;
 }
+
+/* Swiper custom styles */
+.swiper-pagination-bullet-active {
+  background-color: var(--color-primary) !important;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: var(--color-primary) !important;
+}

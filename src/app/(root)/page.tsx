@@ -17,21 +17,22 @@ const Main = () => {
   const router = useCustomRouter();
 
   return (
-    <>
+    <div className="max-w-md mx-auto bg-gray-50 min-h-screen relative">
       <div className="w-full h-full relative z-10">
         <Map />
       </div>
+      
       <button
-        className="fixed bottom-28 right-3 z-30 flex bg-primary text-white p-2 pr-3 rounded-lg items-center"
+        className="fixed bottom-24 right-4 z-30 w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30 transition-all duration-200 hover:scale-105"
         onClick={() => router.push("/my-groups/create")}
       >
-        <Plus size={20} />
-        <p className="text-sm font-semibold">모임 생성</p>
+        <Plus size={24} className="text-white" />
       </button>
+      
       <SearchInput />
       <GroupTypeSelector />
       <MeetingDetail />
-    </>
+    </div>
   );
 };
 

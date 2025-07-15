@@ -17,7 +17,7 @@ const Main = () => {
   const router = useCustomRouter();
 
   return (
-    <div className="max-w-md mx-auto bg-gray-50 min-h-screen relative">
+    <>
       <div className="w-full h-full relative z-10">
         <Map />
       </div>
@@ -32,7 +32,7 @@ const Main = () => {
       <SearchInput />
       <GroupTypeSelector />
       <MeetingDetail />
-    </div>
+    </>
   );
 };
 

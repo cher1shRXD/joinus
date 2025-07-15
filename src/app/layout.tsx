@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     width: "device-width",
     initialScale: 1,
     maximumScale: 1,
-    userScalable: false
+    userScalable: false,
   },
 };
 
@@ -35,14 +35,16 @@ const RootLayout = ({
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
-        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services" async></script>
+        <script
+          type="text/javascript"
+          src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services"
+          async
+        ></script>
       </head>
       <body className={`${pretendard.variable} antialiased`}>
         <ToastContainer />
         <LoadingProvider color="#FF582A" />
-        <CookiesProvider>
-          {children}
-        </CookiesProvider>
+        <CookiesProvider>{children}</CookiesProvider>
       </body>
     </html>
   );

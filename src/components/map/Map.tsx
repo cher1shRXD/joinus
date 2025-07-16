@@ -150,13 +150,13 @@ const Map = ({ searchQuery }: MapProps) => {
     );
   }
 
-  const createCustomIcon = (category: string) => {
+  const createCustomIcon = (category: string, amount: number) => {
     const IconComponent = categoryIconMap[category] || categoryIconMap["all"];
     const backgroundColor =
       categoryColorMap[category] || categoryColorMap["all"];
 
     const iconHtml = renderToStaticMarkup(
-      <IconComponent className="w-10 h-10" backgroundColor={backgroundColor} />
+      <IconComponent className={`${ amount > 4 ? "w-30 h-30" : amount === 3 ? "w-26 h-26" : amount === 2 ? "w-24 h-24" : amount === 1 ? "w-22 h-22 " : "w-20 h-20"}`} backgroundColor={backgroundColor} />
     );
 
     return L.divIcon({
@@ -201,7 +201,7 @@ const Map = ({ searchQuery }: MapProps) => {
       <MapContainer
         ref={setMap}
         center={initialCenter}
-        zoom={13}
+        zoom={16}
         style={{ height: "100%", width: "100%" }}
         zoomControl={false}
         attributionControl={false}
@@ -214,7 +214,7 @@ const Map = ({ searchQuery }: MapProps) => {
             <Marker
               key={marker.meetingId}
               position={[marker.location.latitude, marker.location.longitude]}
-              icon={createCustomIcon(marker.category)}
+              icon={createCustomIcon(marker.category, marker.amount)}
               eventHandlers={{
                 click: (e) => {
                   L.DomEvent.stopPropagation(e);

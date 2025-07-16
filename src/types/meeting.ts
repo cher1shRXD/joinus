@@ -14,6 +14,7 @@ interface MeetingBase {
   category: string;
   type: string;
   isMember: boolean
+  amount: number;
 }
 
 export interface RegularMeeting extends MeetingBase {

@@ -5,6 +5,7 @@ import { customFetch } from "@/libs/fetch/customFetch";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "@/components/provider/ToastProvider";
+import { User, Clock, CheckCircle, XCircle } from "lucide-react";
 
 interface JoinRequest {
   requestId: string;
@@ -63,56 +64,110 @@ const JoinRequestsPage = () => {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center">
-        <p>참가 요청을 불러오는 중...</p>
+      <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
+        <div className="bg-white p-4">
+          <GoBack title="참가 요청 관리" />
+        </div>
+        <div className="flex justify-center py-12">
+          <div className="text-gray-500">참가 요청을 불러오는 중...</div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center text-red-500">
-        <p>{error}</p>
+      <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
+        <div className="bg-white p-4">
+          <GoBack title="참가 요청 관리" />
+        </div>
+        <div className="flex flex-col items-center py-12">
+          <div className="text-gray-400 text-4xl mb-2">❌</div>
+          <div className="text-gray-500 text-center">
+            <p>{error}</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="w-full p-2">
+    <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
+      <div className="bg-white p-4">
         <GoBack title="참가 요청 관리" />
+        <h1 className="text-xl font-bold text-gray-900 mt-4">참가 요청</h1>
       </div>
-      <div className="flex-1 p-3 overflow-y-auto">
-        <h1 className="text-2xl font-bold mb-4">참가 요청</h1>
+
+      <div className="p-4">
         {requests.length === 0 ? (
-          <p className="text-center text-gray-500 mt-10">현재 참가 요청이 없습니다.</p>
+          <div className="flex flex-col items-center py-16">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <User size={24} className="text-gray-400" />
+            </div>
+            <div className="text-gray-500 text-center">
+              <p className="font-medium mb-1">현재 참가 요청이 없습니다</p>
+              <p className="text-sm text-gray-400">새로운 요청이 오면 여기에 표시됩니다</p>
+            </div>
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {requests.map((request) => (
-              <div key={request.requestId} className="bg-white p-4 rounded-lg shadow">
-                <div className="flex items-center gap-3">
+              <div key={request.requestId} className="bg-white rounded-xl p-4 border border-gray-100">
+                <div className="flex items-center gap-3 mb-3">
                   {request.user.profileImageUrl ? (
-                    <img src={request.user.profileImageUrl} alt={request.user.nickname} className="w-10 h-10 rounded-full object-cover" />
+                    <img 
+                      src={request.user.profileImageUrl} 
+                      alt={request.user.nickname} 
+                      className="w-12 h-12 rounded-full object-cover" 
+                    />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold">
-                      {request.user.nickname.charAt(0)}
+                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                      <span className="text-gray-600 font-semibold">
+                        {request.user.nickname.charAt(0)}
+                      </span>
                     </div>
                   )}
-                  <p className="font-bold text-lg">{request.user.nickname}</p>
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900">{request.user.nickname}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Clock size={12} className="text-gray-400" />
+                      <span className="text-xs text-gray-500">
+                        {new Date(request.requestedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0">
+                    {request.status === 'pending' && (
+                      <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-lg font-medium">
+                        대기중
+                      </span>
+                    )}
+                    {request.status === 'approved' && (
+                      <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-lg font-medium flex items-center gap-1">
+                        <CheckCircle size={12} />
+                        승인됨
+                      </span>
+                    )}
+                    {request.status === 'rejected' && (
+                      <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-lg font-medium flex items-center gap-1">
+                        <XCircle size={12} />
+                        거절됨
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <p className="text-gray-600">요청일: {new Date(request.requestedAt).toLocaleString()}</p>
-                <p className="text-sm text-gray-500">상태: {request.status === 'pending' ? '대기 중' : request.status === 'approved' ? '승인됨' : '거절됨'}</p>
+                
                 {request.status === 'pending' && (
-                  <div className="mt-3 flex gap-2">
+                  <div className="flex gap-2 pt-3 border-t border-gray-100">
                     <button
                       onClick={() => handleApproveReject(request.requestId, 'approve')}
-                      className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
+                      className="flex-1 bg-green-50 text-green-600 py-2 rounded-lg hover:bg-green-100 active:bg-green-200 transition-colors font-medium text-sm"
                     >
                       승인
                     </button>
                     <button
                       onClick={() => handleApproveReject(request.requestId, 'reject')}
-                      className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
+                      className="flex-1 bg-red-50 text-red-600 py-2 rounded-lg hover:bg-red-100 active:bg-red-200 transition-colors font-medium text-sm"
                     >
                       거절
                     </button>

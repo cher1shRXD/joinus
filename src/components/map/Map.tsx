@@ -15,6 +15,10 @@ import {
   UserLocationIcon,
 } from "@/components/icons/MapIcons";
 import { renderToStaticMarkup } from "react-dom/server";
+import { io } from "socket.io-client";
+import { useSurveyStore } from "@/stores/survey";
+import { Survey } from "@/types/survey";
+import { useCustomRouter } from "@/hooks/common/useCustomRouter";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((m) => m.MapContainer),
@@ -32,6 +36,8 @@ interface MapProps {
   searchQuery?: string;
 }
 
+export const socketClient = io(process.env.NEXT_PUBLIC_API_URL);
+
 const Map = ({ searchQuery }: MapProps) => {
   const { setMeeting } = useMeetingStore();
   const [mounted, setMounted] = useState(false);
@@ -41,6 +47,8 @@ const Map = ({ searchQuery }: MapProps) => {
   const [markers, setMarkers] = useState<Meeting[]>([]);
   const [allMarkers, setAllMarkers] = useState<Meeting[]>([]);
   const { selected } = useSelectedGroupStore();
+  const { setData } = useSurveyStore();
+  const router = useCustomRouter();
 
   const getRegularMarkers = async () => {
     console.log("Fetching markers for location:", location.coordinates);
@@ -123,7 +131,19 @@ const Map = ({ searchQuery }: MapProps) => {
       setMounted(true);
     };
 
+    socketClient.on(
+      "survey-request",
+      (data) => {
+        setData(data as Survey);
+        router.push('/survey');
+      }
+    );
+
     loadLeaflet();
+
+    return () => {
+      socketClient.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -156,7 +176,20 @@ const Map = ({ searchQuery }: MapProps) => {
       categoryColorMap[category] || categoryColorMap["all"];
 
     const iconHtml = renderToStaticMarkup(
-      <IconComponent className={`${ amount > 4 ? "w-38 h-38" : amount === 3 ? "w-32 h-32" : amount === 2 ? "w-26 h-26" : amount === 1 ? "w-20 h-20 " : "w-14 h-14"}`} backgroundColor={backgroundColor} />
+      <IconComponent
+        className={`${
+          amount > 4
+            ? "w-38 h-38"
+            : amount === 3
+            ? "w-32 h-32"
+            : amount === 2
+            ? "w-26 h-26"
+            : amount === 1
+            ? "w-20 h-20 "
+            : "w-14 h-14"
+        }`}
+        backgroundColor={backgroundColor}
+      />
     );
 
     return L.divIcon({
@@ -204,8 +237,7 @@ const Map = ({ searchQuery }: MapProps) => {
         zoom={16}
         style={{ height: "100%", width: "100%" }}
         zoomControl={false}
-        attributionControl={false}
-      >
+        attributionControl={false}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {markers.map((marker) => {

@@ -51,7 +51,7 @@ const CategorySelector = ({ categories, selectedCategory, onCategorySelect }: Ca
       <button
         key={category.id}
         onClick={() => onCategorySelect(category.id)}
-        className={`flex-1 flex flex-col items-center gap-2 p-1 transition-all duration-200 ${
+        className={`w-16 flex flex-col items-center gap-2 p-1 transition-all duration-200 ${
           isSelected ? 'scale-105' : 'hover:scale-102'
         }`}
       >
@@ -74,13 +74,20 @@ const CategorySelector = ({ categories, selectedCategory, onCategorySelect }: Ca
   };
 
   return (
-    <div className="w-full space-y-3">
-      <div className="flex gap-2">
-        {firstRow.map(renderCategoryButton)}
+    <div className="w-full overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div className="min-w-max space-y-3 pb-2">
+        <div className="flex gap-2">
+          {firstRow.map(renderCategoryButton)}
+        </div>
+        <div className="flex gap-2">
+          {secondRow.map(renderCategoryButton)}
+        </div>
       </div>
-      <div className="flex gap-2">
-        {secondRow.map(renderCategoryButton)}
-      </div>
+      <style jsx>{`
+        .overflow-x-auto::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };

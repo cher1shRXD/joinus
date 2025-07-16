@@ -8,7 +8,7 @@ import CategorySelector from "@/components/meeting/CategorySelector";
 
 const Arounds = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedTab, setSelectedTab] = useState<'regular' | 'flash'>('regular');
+  const [selectedTab, setSelectedTab] = useState<'regular' | 'flash'>('flash');
   const [regularMeetings, setRegularMeetings] = useState<RegularMeeting[]>([]);
   const [flashMeetings, setFlashMeetings] = useState<FlashMeeting[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,16 +55,6 @@ const Arounds = () => {
         
         <div className="flex gap-2 mb-4">
           <button
-            onClick={() => setSelectedTab('regular')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              selectedTab === 'regular'
-                ? 'bg-primary text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            정기 모임
-          </button>
-          <button
             onClick={() => setSelectedTab('flash')}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               selectedTab === 'flash'
@@ -73,6 +63,16 @@ const Arounds = () => {
             }`}
           >
             번개 모임
+          </button>
+          <button
+            onClick={() => setSelectedTab('regular')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              selectedTab === 'regular'
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            정기 모임
           </button>
         </div>
 

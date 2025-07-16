@@ -101,7 +101,17 @@ const GroupDetailPage = () => {
             <div className="flex items-center gap-2">
               <Clock size={16} className="text-gray-400" />
               <span className="text-gray-700 text-sm">
-                {new Date(groupDetails.startTime).toLocaleString()}
+                {(() => {
+                  const date = typeof groupDetails.startTime === 'string' 
+                    ? new Date(groupDetails.startTime)
+                    : new Date(groupDetails.startTime._seconds * 1000);
+                  return date.toLocaleString('ko-KR', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  });
+                })()}
               </span>
             </div>
 

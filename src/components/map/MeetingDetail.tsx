@@ -186,7 +186,17 @@ const MeetingDetail = () => {
           <>
             <p className="text-sm text-gray-400">
               시작 시간:{" "}
-              {new Date(meeting.startTime._seconds * 1000).toLocaleString()}
+              {(() => {
+                const date = typeof meeting.startTime === 'string' 
+                  ? new Date(meeting.startTime)
+                  : new Date(meeting.startTime._seconds * 1000);
+                return date.toLocaleString('ko-KR', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+              })()}
             </p>
             <p className="text-sm text-gray-400">
               예상 소요 시간: {meeting.expectedDurationMinutes}분

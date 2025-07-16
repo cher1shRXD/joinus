@@ -208,7 +208,8 @@ const ChatRoom = () => {
                             <img 
                               src={imageUrl} 
                               alt="채팅 이미지" 
-                              className="rounded-lg max-w-40 max-h-40 object-cover"
+                              className="rounded-lg max-w-48 max-h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                              onClick={() => window.open(imageUrl, '_blank')}
                             />
                             {msg.message && (
                               <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{msg.message}</p>
@@ -236,36 +237,36 @@ const ChatRoom = () => {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={!isConnected}
-            className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full flex items-center justify-center transition-colors disabled:opacity-50"
+            className="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full flex items-center justify-center transition-colors disabled:opacity-50"
           >
-            <Image size={14} />
+            <Image size={18} />
           </button>
           
-          <div className="flex-1 flex items-center gap-1.5 bg-gray-50 rounded-full px-3 py-2 border border-gray-200">
+          <div className="flex-1 flex items-center gap-2 bg-gray-50 rounded-full px-4 py-2.5 border border-gray-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="메시지 입력..."
               disabled={!isConnected}
-              className="flex-1 bg-transparent border-none resize-none focus:outline-none disabled:opacity-50 min-h-[16px] max-h-[64px] placeholder-gray-500 text-sm leading-relaxed"
+              className="flex-1 bg-transparent border-none resize-none focus:outline-none disabled:opacity-50 min-h-[18px] max-h-[72px] placeholder-gray-500 text-base leading-relaxed"
               rows={1}
               style={{ 
-                lineHeight: '16px',
-                height: '16px'
+                lineHeight: '18px',
+                height: '18px'
               }}
               onInput={(e) => {
                 const target = e.target as HTMLTextAreaElement;
-                target.style.height = '16px';
-                target.style.height = Math.min(target.scrollHeight, 64) + 'px';
+                target.style.height = '18px';
+                target.style.height = Math.min(target.scrollHeight, 72) + 'px';
               }}
             />
             <button
               onClick={handleSend}
               disabled={!message.trim() || !isConnected}
-              className="w-6 h-6 bg-[#FF582A] text-white rounded-full flex items-center justify-center hover:bg-[#E54517] transition-colors disabled:opacity-50 disabled:bg-gray-300"
+              className="w-9 h-9 bg-[#FF582A] text-white rounded-full flex items-center justify-center hover:bg-[#E54517] active:scale-95 transition-all disabled:opacity-50 disabled:bg-gray-300"
             >
-              <Send size={12} strokeWidth={2} />
+              <Send size={18} strokeWidth={2} />
             </button>
           </div>
           

@@ -41,8 +41,15 @@ const Profile = () => {
     }
   };
 
-  const formatFirebaseDate = (timestamp: { _seconds: number; _nanoseconds: number }) => {
-    return new Date(timestamp._seconds * 1000).toLocaleDateString('ko-KR');
+  const formatFirebaseDate = (timestamp: { _seconds: number; _nanoseconds: number } | string) => {
+    const date = typeof timestamp === 'string' 
+      ? new Date(timestamp)
+      : new Date(timestamp._seconds * 1000);
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   if (loading) {

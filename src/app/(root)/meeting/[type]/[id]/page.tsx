@@ -61,8 +61,10 @@ const MeetingDetail = () => {
     }
   };
 
-  const formatFlashTime = (timestamp: { _seconds: number; _nanoseconds: number }) => {
-    const date = new Date(timestamp._seconds * 1000);
+  const formatFlashTime = (timestamp: { _seconds: number; _nanoseconds: number } | string) => {
+    const date = typeof timestamp === 'string' 
+      ? new Date(timestamp)
+      : new Date(timestamp._seconds * 1000);
     return date.toLocaleString('ko-KR', {
       month: 'long',
       day: 'numeric',

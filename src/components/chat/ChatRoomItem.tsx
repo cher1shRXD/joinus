@@ -24,39 +24,38 @@ const ChatRoomItem = ({ chatRoomImage, profileImageUrl, roomId, lastMessage, mem
 
   return (
     <div 
-      className="flex items-center gap-3 p-3 mx-2 rounded-2xl hover:bg-gray-50 cursor-pointer transition-colors" 
+      className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-sm active:scale-[0.98] transition-all duration-200 cursor-pointer" 
       onClick={handleClick}
     >
-      <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-        {imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={name} 
-            className="w-full h-full object-cover" 
-          />
-        ) : (
-          <div className="w-full h-full bg-[#FF582A] flex items-center justify-center">
-            <span className="text-white text-lg font-medium">
-              {name.charAt(0)}
-            </span>
-          </div>
-        )}
-      </div>
-      
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2 min-w-0">
-            <h3 className="font-medium text-gray-900 truncate text-base">{name}</h3>
-            {type === 'group' && memberCount && (
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{memberCount}</span>
-            )}
-          </div>
-          {lastMessageAt && (
-            <span className="text-xs text-gray-400 ml-2 flex-shrink-0">{formatChatTime(lastMessageAt)}</span>
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+          {imageUrl ? (
+            <img 
+              src={imageUrl} 
+              alt={name} 
+              className="w-full h-full object-cover" 
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            </div>
           )}
         </div>
         
-        <p className="text-sm text-gray-500 truncate">{lastMessage || '메시지가 없습니다'}</p>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between mb-1">
+            <div className="flex items-center gap-2 min-w-0">
+              <h3 className="font-semibold text-gray-900 truncate text-sm">{name}</h3>
+              {type === 'group' && memberCount && (
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md flex-shrink-0">{memberCount}</span>
+              )}
+            </div>
+            {lastMessageAt && (
+              <span className="text-xs text-gray-400 flex-shrink-0">{formatChatTime(lastMessageAt)}</span>
+            )}
+          </div>
+          
+          <p className="text-sm text-gray-600 truncate">{lastMessage || '메시지가 없습니다'}</p>
+        </div>
       </div>
     </div>
   )

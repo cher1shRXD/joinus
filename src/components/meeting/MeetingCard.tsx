@@ -14,8 +14,10 @@ const MeetingCard = ({ meeting, type }: MeetingCardProps) => {
     router.push(`/meeting/${type}/${meeting.meetingId}`);
   };
 
-  const formatFlashTime = (timestamp: { _seconds: number; _nanoseconds: number }) => {
-    const date = new Date(timestamp._seconds * 1000);
+  const formatFlashTime = (timestamp: { _seconds: number; _nanoseconds: number } | string) => {
+    const date = typeof timestamp === 'string' 
+      ? new Date(timestamp)
+      : new Date(timestamp._seconds * 1000);
     const now = new Date();
     const diffHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
     

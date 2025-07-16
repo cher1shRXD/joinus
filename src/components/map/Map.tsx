@@ -156,7 +156,7 @@ const Map = ({ searchQuery }: MapProps) => {
       categoryColorMap[category] || categoryColorMap["all"];
 
     const iconHtml = renderToStaticMarkup(
-      <IconComponent className={`${ amount > 4 ? "w-30 h-30" : amount === 3 ? "w-26 h-26" : amount === 2 ? "w-24 h-24" : amount === 1 ? "w-22 h-22 " : "w-20 h-20"}`} backgroundColor={backgroundColor} />
+      <IconComponent className={`${ amount > 4 ? "w-38 h-38" : amount === 3 ? "w-32 h-32" : amount === 2 ? "w-26 h-26" : amount === 1 ? "w-20 h-20 " : "w-14 h-14"}`} backgroundColor={backgroundColor} />
     );
 
     return L.divIcon({

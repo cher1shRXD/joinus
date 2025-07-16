@@ -28,13 +28,18 @@ const Marker = dynamic(() => import("react-leaflet").then((m) => m.Marker), {
   ssr: false,
 });
 
-const Map = () => {
+interface MapProps {
+  searchQuery?: string;
+}
+
+const Map = ({ searchQuery }: MapProps) => {
   const { setMeeting } = useMeetingStore();
   const [mounted, setMounted] = useState(false);
   const [map, setMap] = useState<LeafletMap | null>(null);
   const [L, setL] = useState<any>(null);
   const location = useGeolocation();
   const [markers, setMarkers] = useState<Meeting[]>([]);
+  const [allMarkers, setAllMarkers] = useState<Meeting[]>([]);
   const { selected } = useSelectedGroupStore();
 
   const getRegularMarkers = async () => {
@@ -44,6 +49,7 @@ const Map = () => {
         `/meetings/regular/nearby?latitude=${location.coordinates?.latitude}&longitude=${location.coordinates?.longitude}`
       );
       console.log("Setting markers:", data);
+      setAllMarkers(data || []);
       setMarkers(data || []);
     } catch (error) {
       console.error("Error fetching markers:", error);
@@ -56,6 +62,7 @@ const Map = () => {
       const data = await customFetch.get<{ meetings: Meeting[] }>(
         `/search/meetings?latitude=${location.coordinates?.latitude}&longitude=${location.coordinates?.longitude}&type=flash`
       );
+      setAllMarkers(data.meetings || []);
       setMarkers(data.meetings || []);
     } catch (error) {
       console.error("Error fetching markers:", error);
@@ -79,6 +86,24 @@ const Map = () => {
       getMarkers();
     }
   }, [location, selected]);
+
+  useEffect(() => {
+    if (!searchQuery?.trim()) {
+      setMarkers(allMarkers);
+      return;
+    }
+
+    const searchTerm = searchQuery.toLowerCase();
+    const filtered = allMarkers.filter(
+      (meeting) =>
+        meeting.name.toLowerCase().includes(searchTerm) ||
+        meeting.description.toLowerCase().includes(searchTerm) ||
+        meeting.location.addressString.toLowerCase().includes(searchTerm) ||
+        meeting.category.toLowerCase().includes(searchTerm)
+    );
+
+    setMarkers(filtered);
+  }, [searchQuery, allMarkers]);
 
   useEffect(() => {
     const loadLeaflet = async () => {
@@ -148,7 +173,7 @@ const Map = () => {
     typeof location.coordinates.latitude === "number" &&
     typeof location.coordinates.longitude === "number"
       ? [location.coordinates.latitude, location.coordinates.longitude]
-      : [37.5665, 126.978]; // Default to Seoul if location not available
+      : [37.5665, 126.978];
 
   const createUserLocationIcon = () => {
     const userIconHtml = renderToStaticMarkup(
@@ -164,7 +189,15 @@ const Map = () => {
   };
 
   return (
-    <div className="w-screen h-full">
+    <div className="w-screen h-full relative">
+      {searchQuery && (
+        <div className="absolute top-20 left-4 bg-white px-3 py-2 rounded-lg shadow-md z-40">
+          <span className="text-sm text-gray-600">
+            {markers.length}개의 모임을 찾았습니다
+          </span>
+        </div>
+      )}
+
       <MapContainer
         ref={setMap}
         center={initialCenter}

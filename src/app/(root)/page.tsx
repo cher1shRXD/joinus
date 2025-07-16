@@ -6,7 +6,7 @@ import MeetingDetail from "@/components/map/MeetingDetail";
 import { useCustomRouter } from "@/hooks/common/useCustomRouter";
 import { Plus } from "lucide-react";
 import dynamic from "next/dynamic";
-import React from "react";
+import React, { useState } from "react";
 
 const Map = dynamic(
   () => import("@/components/map/Map").then((m) => m.default),
@@ -15,11 +15,16 @@ const Map = dynamic(
 
 const Main = () => {
   const router = useCustomRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = () => {
+    console.log("Searching for:", searchQuery);
+  };
 
   return (
     <>
       <div className="w-full h-full relative z-10">
-        <Map />
+        <Map searchQuery={searchQuery} />
       </div>
 
       <button
@@ -29,7 +34,11 @@ const Main = () => {
         <Plus size={24} className="text-white" />
       </button>
 
-      <SearchInput />
+      <SearchInput
+        query={searchQuery}
+        onQueryChange={setSearchQuery}
+        onSearch={handleSearch}
+      />
       <GroupTypeSelector />
       <MeetingDetail />
     </>

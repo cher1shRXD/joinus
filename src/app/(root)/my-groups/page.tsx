@@ -8,6 +8,8 @@ import GoBack from "@/components/common/GoBack";
 import { useCustomRouter } from "@/hooks/common/useCustomRouter";
 import { toast } from "@/components/provider/ToastProvider";
 import { Users, MapPin, Settings } from "lucide-react";
+import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
+import { nanoid } from "nanoid";
 
 const MyGroupsPage = () => {
   const { user } = useUserStore();
@@ -21,15 +23,27 @@ const MyGroupsPage = () => {
 
   const handleUpgrade = async (meetingId: string) => {
     try {
-      const data = await customFetch.post(
-        `/meetings/regular/${meetingId}/upgrade`,
-        {}
-      );
-      if (data) {
-        toast.success("프로모션 업그레이드 성공!");
-      }
-    } catch {
-      toast.error("네트워크 에러");
+      const tossPayments = await loadTossPayments('test_ck_yZqmkKeP8g9mXwvnmvkxVbQRxB9l');
+      const payment = tossPayments.payment({
+        customerKey: nanoid(),
+      });
+
+      await payment.requestPayment({
+        method: 'CARD',
+        amount: {
+          currency: 'KRW',
+          value: 5000,
+        },
+        orderId: `promotion_${meetingId}_${nanoid()}`,
+        orderName: '모임 프로모션 업그레이드',
+        successUrl: `${window.location.origin}/payment/success?meetingId=${meetingId}`,
+        failUrl: `${window.location.origin}/payment/fail`,
+        customerEmail: user?.email || 'customer@example.com',
+        customerName: user?.nickname || '고객',
+      });
+    } catch (error) {
+      console.error('결제 요청 오류:', error);
+      toast.error('결제 요청 중 오류가 발생했습니다.');
     }
   };
 

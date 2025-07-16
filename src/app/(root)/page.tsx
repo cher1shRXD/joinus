@@ -21,14 +21,14 @@ const Main = () => {
       <div className="w-full h-full relative z-10">
         <Map />
       </div>
-      
+
       <button
         className="fixed bottom-24 right-4 z-30 w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30 transition-all duration-200 hover:scale-105"
         onClick={() => router.push("/meeting/create")}
       >
         <Plus size={24} className="text-white" />
       </button>
-      
+
       <SearchInput />
       <GroupTypeSelector />
       <MeetingDetail />

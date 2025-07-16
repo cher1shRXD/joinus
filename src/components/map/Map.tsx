@@ -9,6 +9,12 @@ import useGeolocation from "@/hooks/common/useGeolocation";
 import { customFetch } from "@/libs/fetch/customFetch";
 import { Meeting } from "@/types/meeting";
 import { useSelectedGroupStore } from "@/stores/selected-group";
+import {
+  categoryColorMap,
+  categoryIconMap,
+  UserLocationIcon,
+} from "@/components/icons/MapIcons";
+import { renderToStaticMarkup } from "react-dom/server";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((m) => m.MapContainer),
@@ -119,38 +125,22 @@ const Map = () => {
     );
   }
 
-  const getGlobeIcon = (category: string) => {
-    const emojiMap: Record<string, string> = {
-      "인문학/책/글": "📖",
-      "외국/언어": "🌍",
-      "음악/악기": "🎵",
-      스포츠관람: "🏟️",
-      "아웃도어/여행": "🏕️",
-      "업종/직무": "💼",
-      "문화/공연": "🎭",
-      "공예/만들기": "✂️",
-      "댄스/무용": "💃",
-      봉사활동: "❤️",
-      "사교/인맥": "🤝",
-      "차/바이크": "🏍️",
-      "사진/영상": "📷",
-      "게임/오락": "🎮",
-      "요리/제조": "🍳",
-      반려동물: "🐶",
-      "운동/헬스": "🏋️‍♀️",
-      자기계발: "📈",
-    };
+  const createCustomIcon = (category: string) => {
+    const IconComponent = categoryIconMap[category] || categoryIconMap["all"];
+    const backgroundColor =
+      categoryColorMap[category] || categoryColorMap["all"];
 
-    const emoji = emojiMap[category] || "📌"; // fallback icon
+    const iconHtml = renderToStaticMarkup(
+      <IconComponent className="w-10 h-10" backgroundColor={backgroundColor} />
+    );
 
-    const globeIcon = L.divIcon({
-      html: `<div style="font-size: 24px; width: 40px; height: 40px; background: white; padding: 2px; border-radius: 50%; display:flex; justify-content: center; align-items: center; text-align: center;">${emoji}</div>`,
-      className: "custom-div-icon",
-      iconSize: [24, 24],
-      iconAnchor: [12, 24],
+    return L.divIcon({
+      html: `<div style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">${iconHtml}</div>`,
+      className: "custom-meeting-icon",
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40],
     });
-
-    return globeIcon;
   };
 
   const initialCenter: [number, number] =
@@ -160,12 +150,18 @@ const Map = () => {
       ? [location.coordinates.latitude, location.coordinates.longitude]
       : [37.5665, 126.978]; // Default to Seoul if location not available
 
-  const userLocationIcon = L.divIcon({
-    html: '<div style="font-size: 24px; padding: 2px; border-radius: 50%;">👤</div>',
-    className: "custom-div-icon",
-    iconSize: [24, 24],
-    iconAnchor: [12, 24],
-  });
+  const createUserLocationIcon = () => {
+    const userIconHtml = renderToStaticMarkup(
+      <UserLocationIcon className="w-10 h-10" />
+    );
+
+    return L.divIcon({
+      html: `<div style="filter: drop-shadow(0 2px 8px rgba(59,130,246,0.5));">${userIconHtml}</div>`,
+      className: "custom-user-icon",
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+    });
+  };
 
   return (
     <div className="w-screen h-full">
@@ -175,7 +171,8 @@ const Map = () => {
         zoom={13}
         style={{ height: "100%", width: "100%" }}
         zoomControl={false}
-        attributionControl={false}>
+        attributionControl={false}
+      >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {markers.map((marker) => {
@@ -184,7 +181,7 @@ const Map = () => {
             <Marker
               key={marker.meetingId}
               position={[marker.location.latitude, marker.location.longitude]}
-              icon={getGlobeIcon(marker.category)}
+              icon={createCustomIcon(marker.category)}
               eventHandlers={{
                 click: (e) => {
                   L.DomEvent.stopPropagation(e);
@@ -201,7 +198,7 @@ const Map = () => {
               location.coordinates.latitude,
               location.coordinates.longitude,
             ]}
-            icon={userLocationIcon}
+            icon={createUserLocationIcon()}
           />
         )}
       </MapContainer>

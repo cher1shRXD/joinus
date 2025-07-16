@@ -20,8 +20,8 @@ interface JoinRequest {
 const JoinRequestsPage = () => {
   const params = useParams();
   const { id } = params;
-  const meetingId = (id as string).split("+")[1];
-  const type = (id as string).split("+")[0];
+  const meetingId = (id as string).split("%2B")[1];
+  const type = (id as string).split("%2B")[0];
 
   const [requests, setRequests] = useState<JoinRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +31,7 @@ const JoinRequestsPage = () => {
     const fetchJoinRequests = async () => {
       try {
         setLoading(true);
-        const data = await customFetch.get<JoinRequest[]>(`/meetings/${type}/${meetingId}/requests`);
+        const data = await customFetch.get<JoinRequest[]>(`/meetings/${meetingId}/requests`);
         setRequests(data);
       } catch (err) {
         console.error("Failed to fetch join requests:", err);
